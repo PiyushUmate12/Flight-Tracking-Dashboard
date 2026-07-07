@@ -37,6 +37,9 @@
 // }
 
 export async function getOpenSkyToken() {
+  const google = await fetch("https://www.google.com");
+
+console.log("Google:", google.status);
   console.log("Starting OpenSky token request...");
 
   console.time("OpenSky OAuth");
