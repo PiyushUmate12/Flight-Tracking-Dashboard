@@ -34,12 +34,12 @@ export function filterFlights(
     }
 
     // ---- Airline filter ----
-    if (filters.airline.trim()) {
-      const airline = resolvedAirline?.toLowerCase() ?? "";
-      if (!airline.includes(filters.airline.trim().toLowerCase())) {
-        return false;
-      }
-    }
+  if (filters?.airline?.trim()) {
+  const airline = resolvedAirline?.toLowerCase() ?? "";
+  if (!airline.includes(filters.airline.trim().toLowerCase())) {
+    return false;
+  }
+}
 
     // ---- Altitude filter ----
     if (

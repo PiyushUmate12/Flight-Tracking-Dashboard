@@ -52,10 +52,10 @@ export default function Navbar() {
         >
           <FlightIcon color="primary" />
 
-          <Typography
+ <Typography
   variant="h6"
-  fontWeight={700}
   sx={{
+    fontWeight: 700,
     color: "text.primary",
     display: {
       xs: "none",

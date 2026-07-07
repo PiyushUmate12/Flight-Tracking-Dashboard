@@ -40,7 +40,7 @@ export default function MobileMenu() {
           >
             <FlightIcon color="primary" />
 
-            <Typography fontWeight={700}>
+            <Typography sx={{ fontWeight: 700 }}>
               Flight Tracker
             </Typography>
           </Box>
