@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* Shared */
+.flight-popup-dark .maplibregl-popup-content,
+.flight-popup-light .maplibregl-popup-content {
+  padding: 0;
+  border-radius: 12px;
+  z-index: 1200; /* above MUI AppBar's default z-index of 1100 */
+}
+
+.flight-popup .maplibregl-popup {
+  z-index: 1200;
+}
+
+/* DARK */
+.flight-popup-dark .maplibregl-popup-content {
+  background: #1e293b;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.flight-popup-dark .maplibregl-popup-tip {
+  border-top-color: #1e293b;
+  border-bottom-color: #1e293b;
+  border-left-color: #1e293b;
+  border-right-color: #1e293b;
+}
+
+/* LIGHT */
+.flight-popup-light .maplibregl-popup-content {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.flight-popup-light .maplibregl-popup-tip {
+  border-top-color: #ffffff;
+  border-bottom-color: #ffffff;
+  border-left-color: #ffffff;
+  border-right-color: #ffffff;
+}
