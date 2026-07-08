@@ -295,8 +295,7 @@ export default function FlightContent({ tab, flight }: Props) {
           />
 
           <Typography sx={{ color: "text.secondary", fontSize: 13 }}>
-            Live tracking history will appear here once AviationStack
-            integration is complete.
+            Live tracking history feature will come soon!
           </Typography>
         </Stack>
       )}
