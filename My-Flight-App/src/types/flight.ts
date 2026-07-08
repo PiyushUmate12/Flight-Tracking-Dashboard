@@ -1,5 +1,5 @@
 export interface Flight {
-  // -------- OpenSky --------
+  // -------- AirLabs (live position data) --------
   id: string;
   icao24: string;
   callsign: string;
@@ -14,10 +14,8 @@ export interface Flight {
   originCountry: string;
   lastUpdated: number;
 
-  // -------- AviationStack --------
+  // -------- AirLabs (flight detail data) --------
   airline?: string;
-
-
 
   sourceAirport?: string;
   destinationAirport?: string;
@@ -26,18 +24,18 @@ export interface Flight {
 
   flightStatus?: string;
 
-sourceIata?: string;
-sourceIcao?: string;
+  sourceIata?: string;
+  sourceIcao?: string;
 
-destinationIata?: string;
-destinationIcao?: string;
+  destinationIata?: string;
+  destinationIcao?: string;
 
-aircraftRegistration?: string;
+  aircraftRegistration?: string;
 
-departureTime?: string;
-arrivalTime?: string;
+  departureTime?: string;
+  arrivalTime?: string;
 
-delay?: number;
+  delay?: number;
 
-cachedAt?: number;
+  cachedAt?: number;
 }

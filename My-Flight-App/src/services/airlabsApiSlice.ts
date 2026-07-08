@@ -1,8 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Flight } from "@/types/flight";
 
-export const aviationStackApi = createApi({
-  reducerPath: "aviationStackApi",
+export const airlabsApi = createApi({
+  reducerPath: "airlabsApi",
 
   baseQuery: fetchBaseQuery({
     baseUrl: "/api",
@@ -28,4 +28,4 @@ export const aviationStackApi = createApi({
 export const {
   useGetFlightDetailsQuery,
   useLazyGetFlightDetailsQuery,
-} = aviationStackApi;
+} = airlabsApi;

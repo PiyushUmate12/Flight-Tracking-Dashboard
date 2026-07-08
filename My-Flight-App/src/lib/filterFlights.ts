@@ -11,10 +11,14 @@ export function filterFlights(
   const query = searchQuery.trim().toLowerCase();
 
   return flights.filter((flight) => {
+    // Try resolving to a full airline name via callsign prefix first
+    // (AirLabs only gives raw IATA/ICAO codes, never full names, on the
+    // bulk positions endpoint). Fall back to the raw code if unmapped.
     const resolvedAirline =
-      flight.airline && flight.airline.toLowerCase() !== "unknown"
+      getAirlineFromCallsign(flight.callsign) ??
+      (flight.airline && flight.airline.toLowerCase() !== "unknown"
         ? flight.airline
-        : getAirlineFromCallsign(flight.callsign);
+        : "");
 
     // ---- Search ----
     if (query) {
@@ -34,12 +38,12 @@ export function filterFlights(
     }
 
     // ---- Airline filter ----
-  if (filters?.airline?.trim()) {
-  const airline = resolvedAirline?.toLowerCase() ?? "";
-  if (!airline.includes(filters.airline.trim().toLowerCase())) {
-    return false;
-  }
-}
+    if (filters?.airline?.trim()) {
+      const airline = resolvedAirline?.toLowerCase() ?? "";
+      if (!airline.includes(filters.airline.trim().toLowerCase())) {
+        return false;
+      }
+    }
 
     // ---- Altitude filter ----
     if (

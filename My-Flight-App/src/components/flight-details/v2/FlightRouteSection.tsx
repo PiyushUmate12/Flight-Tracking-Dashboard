@@ -1,55 +1,3 @@
-// "use client";
-
-// import { Box, Typography } from "@mui/material";
-// import FlightTakeoffRoundedIcon from "@mui/icons-material/FlightTakeoffRounded";
-// import FlightLandRoundedIcon from "@mui/icons-material/FlightLandRounded";
-
-// import { Flight } from "@/types/flight";
-
-// interface Props {
-//   flight: Flight;
-// }
-
-// export default function FlightRouteSection({ flight }: Props) {
-//   return (
-//     <Box sx={{ py: 2 }}>
-//       <Box sx={{ display: "flex", gap: 2 }}>
-//         {/* timeline */}
-//         <Box
-//           sx={{
-//             display: "flex",
-//             flexDirection: "column",
-//             alignItems: "center",
-//           }}
-//         >
-//           <FlightTakeoffRoundedIcon sx={{ fontSize: 18, color: "#3b82f6" }} />
-//           <Box sx={{ width: 2, height: 34, bgcolor: "#1f2937" }} />
-//           <FlightLandRoundedIcon sx={{ fontSize: 18, color: "#22c55e" }} />
-//         </Box>
-
-//         {/* content */}
-//         <Box sx={{ flex: 1 }}>
-//           <Typography sx={{ fontSize: 11, color: "#64748b" }}>
-//             Departure
-//           </Typography>
-//           <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
-//             {flight.sourceAirport || "Unknown Airport"}
-//           </Typography>
-
-//           <Box sx={{ height: 12 }} />
-
-//           <Typography sx={{ fontSize: 11, color: "#64748b" }}>
-//             Arrival
-//           </Typography>
-//           <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
-//             {flight.destinationAirport || "Unknown Airport"}
-//           </Typography>
-//         </Box>
-//       </Box>
-//     </Box>
-//   );
-// }
-
 "use client";
 
 import { Box, Typography } from "@mui/material";
@@ -58,6 +6,7 @@ import FlightLandRoundedIcon from "@mui/icons-material/FlightLandRounded";
 
 import { Flight } from "@/types/flight";
 import { getValidCallsign } from "@/utils/FlightHelper";
+import { useGetAirportNameQuery } from "@/services/airportApiSlice";
 
 interface Props {
   flight: Flight;
@@ -76,16 +25,42 @@ function formatAirport(value?: string | null): {
   };
 }
 
+// Treat a 3-letter code (like "IXC") as "not yet resolved to a full name"
+function looksLikeBareCode(value: string): boolean {
+  return /^[A-Z]{3}$/.test(value.trim());
+}
+
 export default function FlightRouteSection({ flight }: Props) {
   const validCallsign = getValidCallsign(flight.callsign);
 
-  const departure = formatAirport(flight.sourceAirport);
-  const arrival = formatAirport(flight.destinationAirport);
+  const rawDeparture = formatAirport(flight.sourceAirport);
+  const rawArrival = formatAirport(flight.destinationAirport);
+
+  // Only fire the lookup if we got back a bare 3-letter code instead of a full name
+  const shouldResolveDep =
+    rawDeparture.isAvailable && looksLikeBareCode(rawDeparture.text);
+  const shouldResolveArr =
+    rawArrival.isAvailable && looksLikeBareCode(rawArrival.text);
+
+  const { data: depData } = useGetAirportNameQuery(rawDeparture.text, {
+    skip: !shouldResolveDep,
+  });
+  const { data: arrData } = useGetAirportNameQuery(rawArrival.text, {
+    skip: !shouldResolveArr,
+  });
+
+  const departure = {
+    ...rawDeparture,
+    text: depData?.name ?? rawDeparture.text,
+  };
+  const arrival = {
+    ...rawArrival,
+    text: arrData?.name ?? rawArrival.text,
+  };
 
   return (
     <Box sx={{ py: 2 }}>
       <Box sx={{ display: "flex", gap: 2 }}>
-        {/* timeline */}
         <Box
           sx={{
             display: "flex",
@@ -98,7 +73,6 @@ export default function FlightRouteSection({ flight }: Props) {
           <FlightLandRoundedIcon sx={{ fontSize: 18, color: "#22c55e" }} />
         </Box>
 
-        {/* content */}
         <Box sx={{ flex: 1 }}>
           <Typography sx={{ fontSize: 11, color: "text.disabled" }}>
             Departure
@@ -132,7 +106,6 @@ export default function FlightRouteSection({ flight }: Props) {
         </Box>
       </Box>
 
-      {/* No route data notice */}
       {!validCallsign && (
         <Box
           sx={{

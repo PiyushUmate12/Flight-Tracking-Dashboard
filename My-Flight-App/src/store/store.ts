@@ -10,14 +10,16 @@ import themeReducer from "@/features/theme/themeSlice";
 import flightReducer from "@/features/flights";
 
 import { flightsApi } from "@/services/flightsApiSlice";
-import { aviationStackApi } from "@/services/aviationStackApiSlice";
+import { airlabsApi } from "@/services/airlabsApiSlice";
+import { airportApi } from "@/services/airportApiSlice";
 
 const rootReducer = combineReducers({
   flights: flightReducer,
   theme: themeReducer,
 
   [flightsApi.reducerPath]: flightsApi.reducer,
-  [aviationStackApi.reducerPath]: aviationStackApi.reducer,
+  [ airlabsApi.reducerPath]:  airlabsApi.reducer,
+  [airportApi.reducerPath]: airportApi.reducer,
 });
 
 // Migrations run when the persisted version is older than `version` below.
@@ -43,7 +45,7 @@ const persistConfig = {
   key: "root",
   storage,
   whitelist: ["flights", "theme"],
-  version: 2, // bumped
+  version: 2,
   migrate: createMigrate(migrations, { debug: false }),
 };
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -56,7 +58,8 @@ export const store = configureStore({
       serializableCheck: false,
     })
       .concat(flightsApi.middleware)
-      .concat(aviationStackApi.middleware),
+      .concat( airlabsApi.middleware)
+      .concat(airportApi.middleware),
 });
 
 export const persistor = persistStore(store);

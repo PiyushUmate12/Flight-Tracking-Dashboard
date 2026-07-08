@@ -1,23 +1,19 @@
+
 import { NextRequest, NextResponse } from "next/server";
+import { AirLabsFlightInfo } from "@/types/api";
 
 export async function GET(request: NextRequest) {
   try {
     const callsign = request.nextUrl.searchParams.get("callsign")?.trim();
 
     if (!callsign) {
-      return NextResponse.json(
-        { message: "Missing callsign" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Missing callsign" }, { status: 400 });
     }
 
-    const base = `${process.env.AVIATIONSTACK_BASE_URL}/flights`;
-    const key = process.env.AVIATIONSTACK_API_KEY;
+    const base = `${process.env.AIRLABS_API_URL}/flight`;
+    const key = process.env.AIRLABS_API_KEY;
 
-    // Try IATA code first (e.g. "UA686")
     let flight = await fetchFlightByParam(base, key, "flight_iata", callsign);
-
-    // Fall back to ICAO code (e.g. "UAL686") if IATA search found nothing
     if (!flight) {
       flight = await fetchFlightByParam(base, key, "flight_icao", callsign);
     }
@@ -27,33 +23,29 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      airline: flight.airline?.name,
+      airline: flight.airline_name ?? flight.airline_iata ?? flight.airline_icao ?? "Unknown",
 
-      flightStatus: flight.flight_status,
+      flightStatus: flight.status,
 
-      sourceAirport: flight.departure?.airport,
-      sourceIata: flight.departure?.iata,
-      sourceIcao: flight.departure?.icao,
+      sourceIata: flight.dep_iata,
+      sourceIcao: flight.dep_icao,
+      sourceAirport: flight.dep_name ?? flight.dep_iata ?? "Unknown",
 
-      destinationAirport: flight.arrival?.airport,
-      destinationIata: flight.arrival?.iata,
-      destinationIcao: flight.arrival?.icao,
+      destinationIata: flight.arr_iata,
+      destinationIcao: flight.arr_icao,
+      destinationAirport: flight.arr_name ?? flight.arr_iata ?? "Unknown",
 
-      aircraftRegistration: flight.aircraft?.registration,
-      aircraftModel: flight.aircraft?.icao24,
+      aircraftRegistration: flight.reg_number,
+      aircraftModel: flight.model,
 
-      departureTime: flight.departure?.scheduled,
-      arrivalTime: flight.arrival?.scheduled,
+      departureTime: flight.dep_time,
+      arrivalTime: flight.arr_time,
 
-      delay: flight.departure?.delay,
+      delay: flight.delayed ?? undefined,
     });
   } catch (err) {
     console.error(err);
-
-    return NextResponse.json(
-      { message: "Unable to fetch flight" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Unable to fetch flight" }, { status: 500 });
   }
 }
 
@@ -62,23 +54,20 @@ async function fetchFlightByParam(
   key: string | undefined,
   param: "flight_iata" | "flight_icao",
   value: string
-) {
-  const url = `${base}?access_key=${key}&${param}=${encodeURIComponent(value)}`;
+): Promise<AirLabsFlightInfo | null> {
+  const url = `${base}?${param}=${encodeURIComponent(value)}&api_key=${key}`;
 
-  const response = await fetch(url, {
-    next: { revalidate: 60 * 60 * 24 },
-  });
+  const response = await fetch(url, { next: { revalidate: 60 * 60 * 24 } });
 
   if (!response.ok) {
-    throw new Error(`AviationStack ${response.status}`);
+    throw new Error(`AirLabs ${response.status}`);
   }
 
   const result = await response.json();
 
-
-  if (!result.data || result.data.length === 0) {
+  if (!result || !result.response) {
     return null;
   }
 
-  return result.data[0];
+  return result.response;
 }

@@ -9,7 +9,7 @@ import {
   setFlightDetailsCache,
 } from "@/features/flights";
 
-import { useLazyGetFlightDetailsQuery } from "@/services/aviationStackApiSlice";
+import { useLazyGetFlightDetailsQuery } from "@/services/airlabsApiSlice";
 import { getValidCallsign } from "@/utils/FlightHelper";
 
 import FlightInfoSection from "./FlightInfoSection";
